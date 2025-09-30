@@ -3,6 +3,7 @@ package com.example.smarthomeapi.service;
 import com.example.smarthomeapi.model.Device;
 import org.springframework.stereotype.Service;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class DeviceService {
@@ -17,11 +18,12 @@ public class DeviceService {
         return deviceList;
     }
 
-    // YENİ EKLENEN METOD
-    public Device getDeviceById(Long id) {
+    public Optional<Device> getDeviceById(Long id) { // DÖNÜŞ TİPİ DEĞİŞTİ
+        // .findFirst() metodu zaten doğal olarak bir Optional döndürür.
+        // Bu yüzden sonundaki .orElse(null) kısmını siliyoruz.
         return deviceList.stream()
                 .filter(device -> device.getId().equals(id))
-                .findFirst()
-                .orElse(null);
+                .findFirst();
     }
+
 }

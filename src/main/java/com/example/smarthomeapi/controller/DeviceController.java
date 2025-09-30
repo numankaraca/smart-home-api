@@ -3,9 +3,12 @@ package com.example.smarthomeapi.controller;
 import com.example.smarthomeapi.model.Device;
 import com.example.smarthomeapi.service.DeviceService;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;  
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.ResponseEntity;
+import java.util.Optional;
+
 
 import java.util.List;
 
@@ -24,9 +27,16 @@ public class DeviceController {
         return deviceService.getAllDevices();
     }
 
-    // Bu metodun çalışması için @PathVariable import'u gerekli
     @GetMapping("/{id}")
-    public Device getDeviceById(@PathVariable Long id) {
-        return deviceService.getDeviceById(id);
+    public ResponseEntity<Device> getDeviceById(@PathVariable Long id) { // DÖNÜŞ TİPİ DEĞİŞTİ
+        Optional<Device> deviceOptional = deviceService.getDeviceById(id);
+
+        if (deviceOptional.isPresent()) {
+            // Optional içinde bir device varsa, onu 200 OK statusu ile döndür
+            return ResponseEntity.ok(deviceOptional.get());
+        } else {
+            // Optional boş ise, 404 Not Found statusu ile boş bir cevap döndür
+            return ResponseEntity.notFound().build();
+        }
     }
 }
