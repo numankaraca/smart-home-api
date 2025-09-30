@@ -8,6 +8,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.http.ResponseEntity;
 import java.util.Optional;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.ResponseStatus;
+
 
 
 import java.util.List;
@@ -38,5 +43,12 @@ public class DeviceController {
             // Optional boş ise, 404 Not Found statusu ile boş bir cevap döndür
             return ResponseEntity.notFound().build();
         }
+    }
+
+
+    @PostMapping
+    @ResponseStatus(HttpStatus.CREATED)
+    public Device createDevice(@RequestBody Device device) {
+        return deviceService.addDevice(device);
     }
 }
