@@ -12,6 +12,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.PutMapping;
 
 
 
@@ -50,5 +51,16 @@ public class DeviceController {
     @ResponseStatus(HttpStatus.CREATED)
     public Device createDevice(@RequestBody Device device) {
         return deviceService.addDevice(device);
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<Device> updateDevice(@PathVariable Long id, @RequestBody Device deviceDetails) {
+        Optional<Device> updatedDeviceOptional = deviceService.updateDevice(id, deviceDetails);
+
+        if (updatedDeviceOptional.isPresent()) {
+            return ResponseEntity.ok(updatedDeviceOptional.get());
+        } else {
+            return ResponseEntity.notFound().build();
+        }
     }
 }

@@ -1,12 +1,35 @@
 ### Get all devices
+# Bu istek, sistemdeki tüm cihazların bir listesini döndürür.
 GET http://localhost:8080/api/v1/devices
+
+
+###
+### Get a single device by its ID
+# URL'deki '1' sayısını değiştirerek farklı ID'ye sahip cihazları sorgulayabilirsin.
+GET http://localhost:8080/api/v1/devices/1
+
 
 ###
 ### Add a new device
+# Bu istek, gövdede (body) gönderilen JSON verilerini kullanarak yeni bir cihaz oluşturur.
+# Cevap olarak, ID'si atanmış yeni cihazı 201 Created statusu ile döndürür.
 POST http://localhost:8080/api/v1/devices
 Content-Type: application/json
 
 {
   "name": "Balkon Işığı",
   "status": false
+}
+
+
+###
+### Update an existing device
+# Bu istek, URL'de belirtilen ID'ye sahip cihazın bilgilerini gövdedeki JSON verileriyle günceller.
+# Örneğin, ID'si 2 olan cihazı güncelliyoruz.
+PUT http://localhost:8080/api/v1/devices/2
+Content-Type: application/json
+
+{
+  "name": "Mutfak Akıllı Priz",
+  "status": true
 }

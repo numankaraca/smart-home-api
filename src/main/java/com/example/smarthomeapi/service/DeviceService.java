@@ -43,4 +43,24 @@ public class DeviceService {
         return newDevice;
     }
 
+    public Optional<Device> updateDevice(Long id, Device deviceDetails) {
+        // Önce güncellenecek cihazı ID'sine göre bulalım.
+        Optional<Device> deviceOptional = getDeviceById(id);
+
+        // Eğer cihaz bulunduysa...
+        if (deviceOptional.isPresent()) {
+            Device existingDevice = deviceOptional.get();
+
+            // Mevcut cihazın bilgilerini yeni gelenlerle güncelle.
+            existingDevice.setName(deviceDetails.getName());
+            existingDevice.setStatus(deviceDetails.isStatus());
+
+            // Güncellenmiş cihazı Optional içinde geri döndür.
+            return Optional.of(existingDevice);
+        } else {
+            // Cihaz bulunamadıysa, boş bir Optional döndür.
+            return Optional.empty();
+        }
+    }
+
 }
