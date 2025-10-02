@@ -33,3 +33,9 @@ Content-Type: application/json
   "name": "Mutfak Akıllı Priz",
   "status": true
 }
+
+###
+### Delete a device by its ID
+# Bu istek, URL'de belirtilen ID'ye sahip cihazı siler.
+# Başarılı olursa, herhangi bir içerik olmadan 204 No Content durum kodunu döndürür.
+DELETE http://localhost:8080/api/v1/devices/4

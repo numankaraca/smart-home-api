@@ -13,6 +13,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.DeleteMapping;
+
 
 
 
@@ -63,4 +65,18 @@ public class DeviceController {
             return ResponseEntity.notFound().build();
         }
     }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteDevice(@PathVariable Long id) {
+        boolean isRemoved = deviceService.deleteDevice(id);
+
+        if (isRemoved) {
+            // Silme işlemi başarılıysa, "İçerik Yok" anlamına gelen 204 No Content durum kodunu döndür.
+            return ResponseEntity.noContent().build();
+        } else {
+            // Silinecek cihaz bulunamadıysa, 404 Not Found döndür.
+            return ResponseEntity.notFound().build();
+        }
+    }
+
 }

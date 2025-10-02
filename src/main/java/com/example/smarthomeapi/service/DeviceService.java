@@ -63,4 +63,12 @@ public class DeviceService {
         }
     }
 
+
+    public boolean deleteDevice(Long id) {
+        // List.removeIf metodu, verilen koşulu sağlayan elemanı listeden siler.
+        // Eğer bir eleman silindiyse 'true', aksi halde 'false' döndürür.
+        // Bu, aradığımız ID'de bir cihaz olup olmadığını ve silinip silinmediğini tek satırda kontrol etmemizi sağlar.
+        return deviceList.removeIf(device -> device.getId().equals(id));
+    }
+
 }
