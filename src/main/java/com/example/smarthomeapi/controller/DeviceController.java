@@ -15,6 +15,9 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import java.util.List;
+import java.util.Optional;
+
 
 
 
@@ -78,9 +81,22 @@ public class DeviceController {
             return ResponseEntity.notFound().build();
         }
     }
+
     @GetMapping("/search")
-    public List<Device> searchDevicesByStatus(@RequestParam boolean status) {
-        return deviceService.getDevicesByStatus(status);
+    public List<Device> searchDevices(
+            @RequestParam(required = false) Boolean status,
+            @RequestParam(required = false) String name) {
+
+        if (name != null) {
+            // Eğer 'name' parametresi verildiyse, isme göre arama yap
+            return deviceService.searchDevicesByName(name);
+        } else if (status != null) {
+            // Eğer 'status' parametresi verildiyse, duruma göre arama yap
+            return deviceService.getDevicesByStatus(status);
+        } else {
+            // Hiç parametre verilmediyse, tüm cihazları döndür
+            return deviceService.getAllDevices();
+        }
     }
 
 }

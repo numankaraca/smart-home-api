@@ -11,5 +11,5 @@ public interface DeviceRepository extends JpaRepository<Device, Long> {
 
     // YENİ EKLENEN METOD
     List<Device> findByStatus(boolean status);
-
+    List<Device> findByNameContainingIgnoreCase(String keyword);
 }

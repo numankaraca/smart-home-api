@@ -63,4 +63,9 @@ public class DeviceService {
     public List<Device> getDevicesByStatus(boolean status) {
         return deviceRepository.findByStatus(status);
     }
+
+    public List<Device> searchDevicesByName(String keyword) {
+        return deviceRepository.findByNameContainingIgnoreCase(keyword);
+    }
+
 }

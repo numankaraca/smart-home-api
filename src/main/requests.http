@@ -3,48 +3,77 @@
 GET http://localhost:8080/api/v1/devices
 
 
-###
 ### Get a single device by its ID
 # URL'deki '1' sayısını değiştirerek farklı ID'ye sahip cihazları sorgulayabilirsin.
 GET http://localhost:8080/api/v1/devices/1
 
 
-###
-### Add a new device
-# Bu istek, gövdede (body) gönderilen JSON verilerini kullanarak yeni bir cihaz oluşturur.
-# Cevap olarak, ID'si atanmış yeni cihazı 201 Created statusu ile döndürür.
+### Add Device 1: Salon Lambası (Açık)
 POST http://localhost:8080/api/v1/devices
 Content-Type: application/json
 
 {
-  "name": "Balkon Işığı",
+  "name": "Salon Lambası",
+  "status": true
+}
+
+
+### Add Device 2: Mutfak Prizi (Kapalı)
+POST http://localhost:8080/api/v1/devices
+Content-Type: application/json
+
+{
+  "name": "Mutfak Prizi",
   "status": false
 }
 
 
-###
-### Update an existing device
-# Bu istek, URL'de belirtilen ID'ye sahip cihazın bilgilerini gövdedeki JSON verileriyle günceller.
-# Örneğin, ID'si 2 olan cihazı güncelliyoruz.
-PUT http://localhost:8080/api/v1/devices/2
+### Add Device 3: Yatak Odası Lambası (Kapalı)
+POST http://localhost:8080/api/v1/devices
 Content-Type: application/json
 
 {
-  "name": "Mutfak Akıllı Priz",
+  "name": "Yatak Odası Lambası",
+  "status": false
+}
+
+
+### Update an existing device
+# ID'si 3 olan cihazı güncelliyoruz.
+PUT http://localhost:8080/api/v1/devices/3
+Content-Type: application/json
+
+{
+  "name": "Yatak Odası Lambası",
   "status": true
 }
 
-###
+
 ### Delete a device by its ID
-# Bu istek, URL'de belirtilen ID'ye sahip cihazı siler.
-# Başarılı olursa, herhangi bir içerik olmadan 204 No Content durum kodunu döndürür.
-DELETE http://localhost:8080/api/v1/devices/4
-
-###
-### Search for devices by status (e.g., only 'on' devices)
-GET http://localhost:8080/api/v1/devices/search?status=true
+# ID'si 2 olan cihazı siliyoruz.
+DELETE http://localhost:8080/api/v1/devices/2
 
 
-###
+### Search for devices by name (case-insensitive)
+# Adında "lamba" kelimesi geçen tüm cihazları bulur
+GET http://localhost:8080/api/v1/devices/search?name=lamba
+
+
 ### Search for devices by status (e.g., only 'off' devices)
 GET http://localhost:8080/api/v1/devices/search?status=false
+
+### Update a device
+PUT http://localhost:8080/api/v1/devices/3
+Content-Type: application/json
+
+{
+  "name": "Yatak Odası Lambası",
+  "status": true
+}
+
+### Delete a device
+DELETE http://localhost:8080/api/v1/devices/2
+
+
+### Get all devices (Final Check)
+GET http://localhost:8080/api/v1/devices
