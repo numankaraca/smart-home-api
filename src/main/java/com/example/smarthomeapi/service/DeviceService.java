@@ -1,66 +1,60 @@
 package com.example.smarthomeapi.service;
 
 import com.example.smarthomeapi.model.Device;
+import com.example.smarthomeapi.repository.DeviceRepository; // YENİ IMPORT
 import org.springframework.stereotype.Service;
+
 import java.util.List;
 import java.util.Optional;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.concurrent.atomic.AtomicLong;
-import java.util.concurrent.atomic.AtomicLong;
 
 @Service
 public class DeviceService {
 
-    private final List<Device> deviceList = new ArrayList<>(List.of(
-            new Device(1L, "Salon Lambası", true),
-            new Device(2L, "Mutfak Prizi", false),
-            new Device(3L, "Yatak Odası Sensörü", true)
-    ));
+    // Artık ArrayList veya sayaç yok! Onun yerine Repository'miz var.
+    private final DeviceRepository deviceRepository;
 
-    private final AtomicLong counter = new AtomicLong(deviceList.size());
+    // Dependency Injection ile Spring'in DeviceRepository'yi bize vermesini sağlıyoruz.
+    public DeviceService(DeviceRepository deviceRepository) {
+        this.deviceRepository = deviceRepository;
+    }
 
     public List<Device> getAllDevices() {
-        return deviceList;
+        // Artık doğrudan veritabanından tüm cihazları çekiyoruz.
+        return deviceRepository.findAll();
     }
 
     public Optional<Device> getDeviceById(Long id) {
-        return deviceList.stream()
-                .filter(device -> device.getId().equals(id))
-                .findFirst();
+        // Repository'nin hazır findById metodu zaten Optional döndürüyor.
+        return deviceRepository.findById(id);
     }
 
     public Device addDevice(Device newDevice) {
-        Long newId = counter.incrementAndGet();
-        newDevice.setId(newId);
-
-        deviceList.add(newDevice);
-
-        return newDevice;
+        // Repository'nin save metodu, yeni bir nesneyi veritabanına ekler (INSERT).
+        return deviceRepository.save(newDevice);
     }
 
     public Optional<Device> updateDevice(Long id, Device deviceDetails) {
-
-        Optional<Device> deviceOptional = getDeviceById(id);
+        // Önce cihazın veritabanında olup olmadığını kontrol edelim.
+        Optional<Device> deviceOptional = deviceRepository.findById(id);
 
         if (deviceOptional.isPresent()) {
             Device existingDevice = deviceOptional.get();
-
             existingDevice.setName(deviceDetails.getName());
             existingDevice.setStatus(deviceDetails.isStatus());
-
-
-            return Optional.of(existingDevice);
+            // Repository'nin save metodu, ID'si olan bir nesneyi günceller (UPDATE).
+            return Optional.of(deviceRepository.save(existingDevice));
         } else {
-
             return Optional.empty();
         }
     }
 
-
     public boolean deleteDevice(Long id) {
-        return deviceList.removeIf(device -> device.getId().equals(id));
+        // Cihazın var olup olmadığını kontrol edelim.
+        if (deviceRepository.existsById(id)) {
+            deviceRepository.deleteById(id);
+            return true;
+        } else {
+            return false;
+        }
     }
-
 }
