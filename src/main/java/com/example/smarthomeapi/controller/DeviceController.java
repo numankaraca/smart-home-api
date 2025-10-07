@@ -2,24 +2,10 @@ package com.example.smarthomeapi.controller;
 
 import com.example.smarthomeapi.model.Device;
 import com.example.smarthomeapi.service.DeviceService;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-import org.springframework.http.ResponseEntity;
-import java.util.Optional;
-import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.ResponseStatus;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import java.util.List;
-import java.util.Optional;
 import jakarta.validation.Valid;
-
-
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -33,70 +19,55 @@ public class DeviceController {
         this.deviceService = deviceService;
     }
 
+    // Bu metodda değişiklik yok, zaten doğru çalışıyordu.
     @GetMapping
     public List<Device> getAllDevices() {
         return deviceService.getAllDevices();
     }
 
+    // --- GÜNCELLENDİ ---
+    // Artık ResponseEntity döndürmüyor, doğrudan Device döndürüyor.
+    // 'if/else' kontrolü tamamen kalktı!
     @GetMapping("/{id}")
-    public ResponseEntity<Device> getDeviceById(@PathVariable Long id) { // DÖNÜŞ TİPİ DEĞİŞTİ
-        Optional<Device> deviceOptional = deviceService.getDeviceById(id);
-
-        if (deviceOptional.isPresent()) {
-            // Optional içinde bir device varsa, onu 200 OK statusu ile döndür
-            return ResponseEntity.ok(deviceOptional.get());
-        } else {
-            // Optional boş ise, 404 Not Found statusu ile boş bir cevap döndür
-            return ResponseEntity.notFound().build();
-        }
+    public Device getDeviceById(@PathVariable Long id) {
+        return deviceService.getDeviceById(id);
     }
 
-
+    // Bu metodda değişiklik yok.
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public Device createDevice(@Valid @RequestBody Device device) {
         return deviceService.addDevice(device);
     }
 
+    // --- GÜNCELLENDİ ---
+    // Bu metod da artık doğrudan Device döndürüyor.
+    // 'if/else' kontrolü tamamen kalktı!
     @PutMapping("/{id}")
-    public ResponseEntity<Device> updateDevice(@PathVariable Long id, @Valid @RequestBody Device deviceDetails) {
-        Optional<Device> updatedDeviceOptional = deviceService.updateDevice(id, deviceDetails);
-
-        if (updatedDeviceOptional.isPresent()) {
-            return ResponseEntity.ok(updatedDeviceOptional.get());
-        } else {
-            return ResponseEntity.notFound().build();
-        }
+    public Device updateDevice(@PathVariable Long id, @Valid @RequestBody Device deviceDetails) {
+        return deviceService.updateDevice(id, deviceDetails);
     }
 
+    // --- GÜNCELLENDİ ---
+    // 'if/else' kontrolü kalktı. Metod artık daha basit.
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteDevice(@PathVariable Long id) {
-        boolean isRemoved = deviceService.deleteDevice(id);
-
-        if (isRemoved) {
-            // Silme işlemi başarılıysa, "İçerik Yok" anlamına gelen 204 No Content durum kodunu döndür.
-            return ResponseEntity.noContent().build();
-        } else {
-            // Silinecek cihaz bulunamadıysa, 404 Not Found döndür.
-            return ResponseEntity.notFound().build();
-        }
+        deviceService.deleteDevice(id);
+        return ResponseEntity.noContent().build();
     }
 
+    // Bu metodda değişiklik yok.
     @GetMapping("/search")
     public List<Device> searchDevices(
             @RequestParam(required = false) Boolean status,
             @RequestParam(required = false) String name) {
 
         if (name != null) {
-            // Eğer 'name' parametresi verildiyse, isme göre arama yap
             return deviceService.searchDevicesByName(name);
         } else if (status != null) {
-            // Eğer 'status' parametresi verildiyse, duruma göre arama yap
             return deviceService.getDevicesByStatus(status);
         } else {
-            // Hiç parametre verilmediyse, tüm cihazları döndür
             return deviceService.getAllDevices();
         }
     }
-
 }
