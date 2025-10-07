@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.DeleteMapping;
-
+import org.springframework.web.bind.annotation.RequestParam;
 
 
 
@@ -77,6 +77,10 @@ public class DeviceController {
             // Silinecek cihaz bulunamadıysa, 404 Not Found döndür.
             return ResponseEntity.notFound().build();
         }
+    }
+    @GetMapping("/search")
+    public List<Device> searchDevicesByStatus(@RequestParam boolean status) {
+        return deviceService.getDevicesByStatus(status);
     }
 
 }

@@ -39,3 +39,12 @@ Content-Type: application/json
 # Bu istek, URL'de belirtilen ID'ye sahip cihazı siler.
 # Başarılı olursa, herhangi bir içerik olmadan 204 No Content durum kodunu döndürür.
 DELETE http://localhost:8080/api/v1/devices/4
+
+###
+### Search for devices by status (e.g., only 'on' devices)
+GET http://localhost:8080/api/v1/devices/search?status=true
+
+
+###
+### Search for devices by status (e.g., only 'off' devices)
+GET http://localhost:8080/api/v1/devices/search?status=false

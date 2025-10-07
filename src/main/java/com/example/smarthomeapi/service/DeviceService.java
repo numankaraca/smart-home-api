@@ -57,4 +57,10 @@ public class DeviceService {
             return false;
         }
     }
+
+    // DeviceService.java içine eklenecek yeni metod
+
+    public List<Device> getDevicesByStatus(boolean status) {
+        return deviceRepository.findByStatus(status);
+    }
 }
