@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import java.util.List;
 import java.util.Optional;
-
+import jakarta.validation.Valid;
 
 
 
@@ -54,12 +54,12 @@ public class DeviceController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public Device createDevice(@RequestBody Device device) {
+    public Device createDevice(@Valid @RequestBody Device device) {
         return deviceService.addDevice(device);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Device> updateDevice(@PathVariable Long id, @RequestBody Device deviceDetails) {
+    public ResponseEntity<Device> updateDevice(@PathVariable Long id, @Valid @RequestBody Device deviceDetails) {
         Optional<Device> updatedDeviceOptional = deviceService.updateDevice(id, deviceDetails);
 
         if (updatedDeviceOptional.isPresent()) {
