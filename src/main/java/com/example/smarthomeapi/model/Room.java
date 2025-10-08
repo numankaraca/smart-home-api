@@ -1,32 +1,29 @@
 package com.example.smarthomeapi.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore; // YENİ IMPORT
 import jakarta.persistence.*; // YENİ IMPORT
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List; // YENİ IMPORT
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "devices")
-public class Device {
+@Table(name = "rooms")
+public class Room {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotBlank(message = "Device name cannot be blank")
+    @NotBlank(message = "Room name cannot be blank")
     private String name;
 
-    private boolean status;
-
     // --- YENİ EKLENEN İLİŞKİ ALANI ---
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "room_id")
-    @JsonIgnore // Bu alanın API cevaplarında görünmemesini sağlar, döngüleri önler.
-    private Room room;
+    @OneToMany(mappedBy = "room", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Device> devices;
     // ------------------------------------
 }

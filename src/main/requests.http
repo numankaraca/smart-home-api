@@ -89,3 +89,47 @@ Content-Type: application/json
 
 ### Test Not Found Exception
 GET http://localhost:8080/api/v1/devices/999
+
+### ===============================================================
+### ROOM MANAGEMENT
+### ===============================================================
+
+### Create a new room (Mutfak)
+POST http://localhost:8080/api/v1/rooms
+Content-Type: application/json
+
+{
+  "name": "Mutfak"
+}
+
+###
+### Create another new room (Salon)
+POST http://localhost:8080/api/v1/rooms
+Content-Type: application/json
+
+{
+  "name": "Salon"
+}
+
+###
+### Get all rooms
+GET http://localhost:8080/api/v1/rooms
+
+
+###
+### Get a single room by ID (e.g., room with ID 1)
+GET http://localhost:8080/api/v1/rooms/3
+
+
+###
+### Update a room's name (e.g., change room with ID 1 to 'Mutfak Alanı')
+PUT http://localhost:8080/api/v1/rooms/1
+Content-Type: application/json
+
+{
+  "name": "Mutfak Alanı"
+}
+
+###
+### Delete a room (e.g., room with ID 2)
+DELETE http://localhost:8080/api/v1/rooms/2
