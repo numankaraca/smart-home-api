@@ -2,7 +2,9 @@ package com.example.smarthomeapi.service;
 
 import com.example.smarthomeapi.exception.ResourceNotFoundException;
 import com.example.smarthomeapi.model.Device;
+import com.example.smarthomeapi.model.Room; // YENİ IMPORT
 import com.example.smarthomeapi.repository.DeviceRepository;
+import com.example.smarthomeapi.repository.RoomRepository; // YENİ IMPORT
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -11,9 +13,12 @@ import java.util.List;
 public class DeviceService {
 
     private final DeviceRepository deviceRepository;
+    private final RoomRepository roomRepository; // YENİ ALAN
 
-    public DeviceService(DeviceRepository deviceRepository) {
+    // Constructor'ı iki repository'yi de alacak şekilde güncelliyoruz.
+    public DeviceService(DeviceRepository deviceRepository, RoomRepository roomRepository) {
         this.deviceRepository = deviceRepository;
+        this.roomRepository = roomRepository;
     }
 
     public List<Device> getAllDevices() {
@@ -21,34 +26,37 @@ public class DeviceService {
     }
 
     public Device getDeviceById(Long id) {
-        // Repository'den cihazı bul, bulamazsa ResourceNotFoundException fırlat.
         return deviceRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Device not found with id: " + id));
     }
 
-    public Device addDevice(Device newDevice) {
+    // --- ESKİ addDevice METODUNU SİLİP YERİNE BUNU EKLİYORUZ ---
+    public Device addDeviceToRoom(Long roomId, Device newDevice) {
+        // 1. Cihazın ekleneceği odayı veritabanından bul.
+        Room room = roomRepository.findById(roomId)
+                .orElseThrow(() -> new ResourceNotFoundException("Room not found with id: " + roomId));
+
+        // 2. Yeni cihaza ait olduğu odayı ata.
+        newDevice.setRoom(room);
+
+        // 3. Odaya bağlanmış olan yeni cihazı kaydet.
         return deviceRepository.save(newDevice);
     }
+    // -----------------------------------------------------------
 
     public Device updateDevice(Long id, Device deviceDetails) {
-        // Önce güncellenecek cihazın var olup olmadığını kontrol et.
-        // Bulamazsa, orElseThrow metodu bizim için hatayı fırlatacak.
         Device existingDevice = deviceRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Device not found with id: " + id));
 
-        // Cihaz bulunduysa, alanlarını güncelle ve veritabanına kaydet.
         existingDevice.setName(deviceDetails.getName());
         existingDevice.setStatus(deviceDetails.isStatus());
         return deviceRepository.save(existingDevice);
     }
 
     public void deleteDevice(Long id) {
-        // Silinecek cihazın var olup olmadığını kontrol et.
-        // Eğer yoksa, hata fırlat.
         if (!deviceRepository.existsById(id)) {
             throw new ResourceNotFoundException("Device not found with id: " + id);
         }
-        // Cihaz varsa, sil.
         deviceRepository.deleteById(id);
     }
 

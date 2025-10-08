@@ -133,3 +133,40 @@ Content-Type: application/json
 ###
 ### Delete a room (e.g., room with ID 2)
 DELETE http://localhost:8080/api/v1/rooms/2
+
+
+
+### ===============================================================
+### DEVICE MANAGEMENT WITHIN ROOMS
+### ===============================================================
+
+### Add a new device (Lamba) to a specific room (e.g., room with ID 1)
+# Bu istek, 1 ID'li odaya yeni bir lamba ekler.
+POST http://localhost:8080/api/v1/rooms/1/devices
+Content-Type: application/json
+
+{
+  "name": "Mutfak Lambası",
+  "status": false
+}
+
+###
+### Add another device (Priz) to the same room (room with ID 1)
+POST http://localhost:8080/api/v1/rooms/1/devices
+Content-Type: application/json
+
+{
+  "name": "Tezgah Prizi",
+  "status": true
+}
+
+###
+### Add a device to a non-existent room (e.g., room with ID 99)
+# Bu istek, "Room not found" hatasıyla başarısız olmalı.
+POST http://localhost:8080/api/v1/rooms/99/devices
+Content-Type: application/json
+
+{
+  "name": "Hayalet Cihaz",
+  "status": false
+}

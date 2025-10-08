@@ -1,6 +1,8 @@
 package com.example.smarthomeapi.controller;
 
+import com.example.smarthomeapi.model.Device; // YENİ IMPORT
 import com.example.smarthomeapi.model.Room;
+import com.example.smarthomeapi.service.DeviceService; // YENİ IMPORT
 import com.example.smarthomeapi.service.RoomService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
@@ -14,9 +16,12 @@ import java.util.List;
 public class RoomController {
 
     private final RoomService roomService;
+    private final DeviceService deviceService; // YENİ ALAN
 
-    public RoomController(RoomService roomService) {
+    // Constructor'ı DeviceService'i de alacak şekilde güncelliyoruz.
+    public RoomController(RoomService roomService, DeviceService deviceService) {
         this.roomService = roomService;
+        this.deviceService = deviceService;
     }
 
     @PostMapping
@@ -45,4 +50,12 @@ public class RoomController {
         roomService.deleteRoom(id);
         return ResponseEntity.noContent().build();
     }
+
+    // --- YENİ EKLENEN METOD ---
+    @PostMapping("/{roomId}/devices")
+    @ResponseStatus(HttpStatus.CREATED)
+    public Device addDeviceToRoom(@PathVariable Long roomId, @Valid @RequestBody Device newDevice) {
+        return deviceService.addDeviceToRoom(roomId, newDevice);
+    }
+    // ---------------------------
 }
