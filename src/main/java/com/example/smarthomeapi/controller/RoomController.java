@@ -58,4 +58,9 @@ public class RoomController {
         return deviceService.addDeviceToRoom(roomId, newDevice);
     }
     // ---------------------------
+
+    @GetMapping("/{roomId}/devices")
+    public List<Device> getDevicesInRoom(@PathVariable Long roomId) {
+        return deviceService.getDevicesByRoomId(roomId);
+    }
 }

@@ -68,4 +68,13 @@ public class DeviceService {
     public List<Device> searchDevicesByName(String keyword) {
         return deviceRepository.findByNameContainingIgnoreCase(keyword);
     }
+
+    public List<Device> getDevicesByRoomId(Long roomId) {
+        // Önce odanın var olup olmadığını kontrol edelim. Yoksa hata fırlatır.
+        roomRepository.findById(roomId)
+                .orElseThrow(() -> new ResourceNotFoundException("Room not found with id: " + roomId));
+
+        // Oda varsa, o odaya ait cihazları döndür.
+        return deviceRepository.findByRoomId(roomId);
+    }
 }
