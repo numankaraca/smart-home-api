@@ -5,6 +5,11 @@ import com.example.smarthomeapi.service.DeviceService;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.http.HttpStatus;
+
 
 import java.util.List;
 
@@ -35,10 +40,14 @@ public class DeviceController {
         return deviceService.updateDevice(id, deviceDetails);
     }
 
+    // YENİ VE DOĞRU HALİ:
+    @Operation(summary = "Delete a device by its ID")
+    @ApiResponse(responseCode = "204", description = "Device deleted successfully")
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteDevice(@PathVariable Long id) {
+    @ResponseStatus(HttpStatus.NO_CONTENT) // BU SATIRI EKLE
+    public void deleteDevice(@PathVariable Long id) { // DÖNÜŞ TİPİNİ void YAP
         deviceService.deleteDevice(id);
-        return ResponseEntity.noContent().build();
+        // return satırı tamamen kalktı!
     }
 
     @GetMapping("/search")

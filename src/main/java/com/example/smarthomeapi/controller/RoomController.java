@@ -8,6 +8,10 @@ import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.http.HttpStatus;
 
 import java.util.List;
 
@@ -45,10 +49,12 @@ public class RoomController {
         return roomService.updateRoom(id, roomDetails);
     }
 
+    @Operation(summary = "Delete a room by its ID")
+    @ApiResponse(responseCode = "204", description = "Room deleted successfully")
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteRoom(@PathVariable Long id) {
+    @ResponseStatus(HttpStatus.NO_CONTENT) // BU SATIRI EKLE
+    public void deleteRoom(@PathVariable Long id) { // DÖNÜŞ TİPİNİ void YAP
         roomService.deleteRoom(id);
-        return ResponseEntity.noContent().build();
     }
 
     // --- YENİ EKLENEN METOD ---
