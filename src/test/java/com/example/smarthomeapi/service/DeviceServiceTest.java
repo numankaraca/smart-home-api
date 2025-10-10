@@ -1,5 +1,6 @@
 package com.example.smarthomeapi.service;
 
+import com.example.smarthomeapi.exception.ResourceNotFoundException;
 import com.example.smarthomeapi.model.Device;
 import com.example.smarthomeapi.repository.DeviceRepository;
 import org.junit.jupiter.api.Test;
@@ -9,39 +10,64 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.List;
+import java.util.Optional; // Gerekli import
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.BDDMockito.given;
 
 @ExtendWith(MockitoExtension.class)
 class DeviceServiceTest {
 
     @Mock
-    private DeviceRepository deviceRepository; // Bu, bizim sahte Repository'miz
+    private DeviceRepository deviceRepository;
 
     @InjectMocks
-    private DeviceService deviceService; // Bu, içine sahte repository'nin enjekte edileceği, test edeceğimiz asıl servis
+    private DeviceService deviceService;
 
     @Test
     void testGetAllDevices() {
-        // GIVEN (Hazırlık Aşaması)
-        // Sahte bir cihaz listesi oluşturalım.
+        // GIVEN
         Device device1 = new Device(1L, "Lamba", true, null);
         Device device2 = new Device(2L, "Priz", false, null);
         List<Device> fakeDeviceList = List.of(device1, device2);
-
-        // Sahte repository'ye talimat veriyoruz:
-        // "Ne zaman birisi senin findAll() metodunu çağırırsa, ona fakeDeviceList'i geri döndür."
         given(deviceRepository.findAll()).willReturn(fakeDeviceList);
 
-        // WHEN (Aksiyon Aşaması)
-        // Test etmek istediğimiz asıl metodu çağırıyoruz.
+        // WHEN
         List<Device> result = deviceService.getAllDevices();
 
-        // THEN (Doğrulama Aşaması)
-        // Gelen sonucun beklediğimiz gibi olup olmadığını kontrol ediyoruz.
-        assertThat(result).isNotNull(); // Sonucun null olmadığını doğrula
-        assertThat(result.size()).isEqualTo(2); // Sonuç listesinin 2 elemanlı olduğunu doğrula
-        assertThat(result).isEqualTo(fakeDeviceList); // Sonucun, sahte listemizle aynı olduğunu doğrula
+        // THEN
+        assertThat(result).isNotNull();
+        assertThat(result.size()).isEqualTo(2);
+    }
+
+    @Test
+    void getDeviceById_whenDeviceExists_shouldReturnDevice() {
+        // GIVEN
+        final Long deviceId = 1L;
+        Device fakeDevice = new Device(deviceId, "Test Lambası", true, null);
+        given(deviceRepository.findById(deviceId)).willReturn(Optional.of(fakeDevice));
+
+        // WHEN
+        Device result = deviceService.getDeviceById(deviceId);
+
+        // THEN
+        assertThat(result).isNotNull();
+        assertThat(result.getId()).isEqualTo(deviceId);
+        assertThat(result.getName()).isEqualTo("Test Lambası");
+    }
+
+    @Test
+    void getDeviceById_whenDeviceDoesNotExist_shouldThrowException() {
+        // GIVEN
+        final Long nonExistentId = 99L;
+        given(deviceRepository.findById(nonExistentId)).willReturn(Optional.empty());
+
+        // WHEN & THEN
+        ResourceNotFoundException exception = assertThrows(ResourceNotFoundException.class, () -> {
+            deviceService.getDeviceById(nonExistentId);
+        });
+
+        assertThat(exception.getMessage()).isEqualTo("Device not found with id: " + nonExistentId);
     }
 }
