@@ -31,3 +31,13 @@ build/
 
 ### VS Code ###
 .vscode/
+
+# H2 Database Files
+*.mv.db
+*.trace.db
+
+# Log files
+*.log
+
+# IntelliJ IDEA files
+.idea/

@@ -9,15 +9,10 @@ public class WebConfig implements WebMvcConfigurer {
 
     @Override
     public void addCorsMappings(CorsRegistry registry) {
-        registry.addMapping("/api/**") // API'mizdeki tüm /api/ ile başlayan yollara uygula
-                .allowedOrigins("http://localhost:63342") // WebStorm'un varsayılan portuna izin ver
-                .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
+        registry.addMapping("/api/**")
+                .allowedOrigins("http://localhost:63342", "http://localhost:63343")
+                .allowedMethods("*") // DEĞİŞİKLİK BURADA
                 .allowedHeaders("*")
                 .allowCredentials(false);
     }
 }
-
-
-
-
-
