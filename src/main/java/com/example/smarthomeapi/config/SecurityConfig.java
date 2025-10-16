@@ -9,14 +9,11 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 
-// PasswordEncoder ile ilgili tüm import'lar ve bean metodu buradan kaldırıldı!
-
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
 
-    // @Bean public PasswordEncoder passwordEncoder() METODU BURADAN SİLİNDİ!
-    // Artık AppConfig sınıfında bulunuyor.
+    // AppConfig'te olduğu için PasswordEncoder burada YOK, bu doğru.
 
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration configuration) throws Exception {
@@ -29,7 +26,16 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/v1/auth/**", "/swagger-ui/**", "/v3/api-docs/**", "/h2-console/**").permitAll()
+                        // --- DEĞİŞİKLİK BURADA ---
+                        // İzin verilen adreslerin listesini daha da netleştiriyoruz.
+                        .requestMatchers(
+                                "/api/v1/auth/**",
+                                "/swagger-ui/**",
+                                "/swagger-ui.html", // ANA KAPIYI BURAYA AÇIKÇA EKLİYORUZ
+                                "/v3/api-docs/**",
+                                "/h2-console/**"
+                        ).permitAll()
+                        // ---------------------------
                         .anyRequest().authenticated()
                 )
                 .headers(headers -> headers.frameOptions(frameOptions -> frameOptions.sameOrigin()));
