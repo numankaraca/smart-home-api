@@ -82,29 +82,27 @@ class DeviceServiceTest {
     void addDeviceToRoom_whenRoomExists_shouldSaveAndReturnDevice() {
         // GIVEN (Hazırlık)
         Long roomId = 1L;
-        Room fakeRoom = new Room(roomId, "Mutfak", null);
-        Device newDevice = new Device(null, "Yeni Lamba", false, null); // ID'si henüz yok
-        Device savedDevice = new Device(4L, "Yeni Lamba", false, fakeRoom); // Kaydedilmiş halinin ID'si var
 
-        // Sahte repository'lere talimatlarımızı veriyoruz:
-        // 1. "roomRepository.findById(1L) çağrıldığında, sahte odamızı döndür."
+        // --- DEĞİŞİKLİK BURADA ---
+        // Room sınıfının yeni constructor'ına uyacak şekilde güncelliyoruz.
+        // (id, name, user, devices)
+        Room fakeRoom = new Room(roomId, "Mutfak", null, null);
+        // -------------------------
+
+        Device newDevice = new Device(null, "Yeni Lamba", false, null);
+        Device savedDevice = new Device(4L, "Yeni Lamba", false, fakeRoom);
+
         given(roomRepository.findById(roomId)).willReturn(Optional.of(fakeRoom));
-        // 2. "deviceRepository.save() metodu herhangi bir Device nesnesi ile çağrıldığında, 'savedDevice' nesnesini döndür."
         given(deviceRepository.save(any(Device.class))).willReturn(savedDevice);
 
         // WHEN (Aksiyon)
-        // Asıl test edeceğimiz metodu çağırıyoruz.
         Device result = deviceService.addDeviceToRoom(roomId, newDevice);
 
         // THEN (Doğrulama)
-        // 1. Dönen sonucun beklediğimiz gibi olup olmadığını kontrol et.
         assertThat(result).isNotNull();
         assertThat(result.getId()).isEqualTo(4L);
 
-        // 2. Metodların doğru çağrılıp çağrılmadığını DOĞRULA (verify).
-        // "roomRepository'nin findById metodu, 1L argümanıyla tam 1 kez çağrıldı mı?"
         verify(roomRepository).findById(roomId);
-        // "deviceRepository'nin save metodu, herhangi bir Device nesnesiyle tam 1 kez çağrıldı mı?"
         verify(deviceRepository).save(any(Device.class));
     }
 }

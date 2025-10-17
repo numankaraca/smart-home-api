@@ -1,5 +1,6 @@
 package com.example.smarthomeapi.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore; // YENİ IMPORT
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -14,8 +15,9 @@ import java.util.List;
 @Table(name = "users")
 @Data
 @NoArgsConstructor
-public class User implements UserDetails { // DEĞİŞİKLİK BURADA
+public class User implements UserDetails {
 
+    // ... (id, username, password, role alanları aynı kalıyor) ...
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -27,6 +29,12 @@ public class User implements UserDetails { // DEĞİŞİKLİK BURADA
     private String password;
 
     private String role;
+
+    // --- YENİ EKLENEN BÖLÜM ---
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonIgnore // Bu çok önemli! Sonsuz döngüyü engeller.
+    private List<Room> rooms;
+    // ---------------------------
 
     public User(String username, String password, String role) {
         this.username = username;

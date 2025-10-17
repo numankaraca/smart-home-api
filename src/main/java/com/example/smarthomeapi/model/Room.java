@@ -1,16 +1,17 @@
 package com.example.smarthomeapi.model;
 
-import jakarta.persistence.*; // YENİ IMPORT
-import jakarta.validation.constraints.NotBlank;
-import lombok.AllArgsConstructor;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank; // Bu import'un da olduğundan emin ol
+import lombok.AllArgsConstructor; // Bu import'u ekle
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.List; // YENİ IMPORT
+import java.util.List;
 
 @Data
 @NoArgsConstructor
-@AllArgsConstructor
+@AllArgsConstructor // Bu anotasyonu da ekle
 @Entity
 @Table(name = "rooms")
 public class Room {
@@ -22,8 +23,11 @@ public class Room {
     @NotBlank(message = "Room name cannot be blank")
     private String name;
 
-    // --- YENİ EKLENEN İLİŞKİ ALANI ---
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false)
+    @JsonIgnore
+    private User user;
+
     @OneToMany(mappedBy = "room", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Device> devices;
-    // ------------------------------------
 }
