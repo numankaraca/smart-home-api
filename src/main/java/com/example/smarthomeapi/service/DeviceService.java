@@ -2,9 +2,11 @@ package com.example.smarthomeapi.service;
 
 import com.example.smarthomeapi.exception.ResourceNotFoundException;
 import com.example.smarthomeapi.model.Device;
-import com.example.smarthomeapi.model.Room; // YENİ IMPORT
+import com.example.smarthomeapi.model.Room;
+import com.example.smarthomeapi.model.User;
 import com.example.smarthomeapi.repository.DeviceRepository;
-import com.example.smarthomeapi.repository.RoomRepository; // YENİ IMPORT
+import com.example.smarthomeapi.repository.RoomRepository;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -13,68 +15,71 @@ import java.util.List;
 public class DeviceService {
 
     private final DeviceRepository deviceRepository;
-    private final RoomRepository roomRepository; // YENİ ALAN
+    private final RoomRepository roomRepository;
 
-    // Constructor'ı iki repository'yi de alacak şekilde güncelliyoruz.
     public DeviceService(DeviceRepository deviceRepository, RoomRepository roomRepository) {
         this.deviceRepository = deviceRepository;
         this.roomRepository = roomRepository;
     }
 
-    public List<Device> getAllDevices() {
-        return deviceRepository.findAll();
+    // --- YARDIMCI METOD ---
+    // Spring Security'nin kasasından o anki kullanıcıyı getiren metod.
+    private User getCurrentUser() {
+        return (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
     }
 
-    public Device getDeviceById(Long id) {
-        return deviceRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Device not found with id: " + id));
+    // --- GÜVENLİ HALE GETİRİLMİŞ METODLAR ---
+
+    // Bir cihazı, sadece o anki kullanıcıya aitse ID'sine göre getirir.
+    public Device getDeviceById(Long deviceId) {
+        User currentUser = getCurrentUser();
+        // Repository'den cihazı, hem kendi ID'sine hem de sahibinin ID'sine göre arar.
+        return deviceRepository.findByIdAndRoomUser(deviceId, currentUser)
+                .orElseThrow(() -> new ResourceNotFoundException("Device not found with id: " + deviceId));
     }
 
-    // --- ESKİ addDevice METODUNU SİLİP YERİNE BUNU EKLİYORUZ ---
+    // Bir cihazi, sadece o anki kullanıcıya ait bir odaya ekler.
     public Device addDeviceToRoom(Long roomId, Device newDevice) {
-        // 1. Cihazın ekleneceği odayı veritabanından bul.
-        Room room = roomRepository.findById(roomId)
+        User currentUser = getCurrentUser();
+        // Önce odanın bu kullanıcıya ait olup olmadığını kontrol et.
+        Room room = roomRepository.findByIdAndUser(roomId, currentUser)
                 .orElseThrow(() -> new ResourceNotFoundException("Room not found with id: " + roomId));
 
-        // 2. Yeni cihaza ait olduğu odayı ata.
         newDevice.setRoom(room);
-
-        // 3. Odaya bağlanmış olan yeni cihazı kaydet.
         return deviceRepository.save(newDevice);
     }
-    // -----------------------------------------------------------
 
-    public Device updateDevice(Long id, Device deviceDetails) {
-        Device existingDevice = deviceRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Device not found with id: " + id));
+    // Bir cihazı, sadece o anki kullanıcıya aitse günceller.
+    public Device updateDevice(Long deviceId, Device deviceDetails) {
+        // getDeviceById metodu zaten sahip kontrolü yapıyor.
+        // Eğer cihaz bu kullanıcıya ait değilse, aşağıdaki satır hata fırlatacak.
+        Device existingDevice = getDeviceById(deviceId);
 
         existingDevice.setName(deviceDetails.getName());
         existingDevice.setStatus(deviceDetails.isStatus());
         return deviceRepository.save(existingDevice);
     }
 
-    public void deleteDevice(Long id) {
-        if (!deviceRepository.existsById(id)) {
-            throw new ResourceNotFoundException("Device not found with id: " + id);
-        }
-        deviceRepository.deleteById(id);
+    // Bir cihazı, sadece o anki kullanıcıya aitse siler.
+    public void deleteDevice(Long deviceId) {
+        // getDeviceById metodu, silinecek cihazın bu kullanıcıya ait olup olmadığını kontrol eder.
+        Device deviceToDelete = getDeviceById(deviceId);
+        deviceRepository.delete(deviceToDelete);
     }
 
-    // Arama metodları aynı kalıyor.
-    public List<Device> getDevicesByStatus(boolean status) {
-        return deviceRepository.findByStatus(status);
-    }
-
-    public List<Device> searchDevicesByName(String keyword) {
-        return deviceRepository.findByNameContainingIgnoreCase(keyword);
-    }
-
+    // Bir odadaki cihazları, sadece o oda o anki kullanıcıya aitse getirir.
     public List<Device> getDevicesByRoomId(Long roomId) {
-        // Önce odanın var olup olmadığını kontrol edelim. Yoksa hata fırlatır.
-        roomRepository.findById(roomId)
+        User currentUser = getCurrentUser();
+        // Önce odanın var olup olmadığını VE bu kullanıcıya ait olup olmadığını kontrol edelim.
+        roomRepository.findByIdAndUser(roomId, currentUser)
                 .orElseThrow(() -> new ResourceNotFoundException("Room not found with id: " + roomId));
 
-        // Oda varsa, o odaya ait cihazları döndür.
+        // Oda bu kullanıcıya aitse, o odaya ait cihazları döndür.
         return deviceRepository.findByRoomId(roomId);
     }
+
+    // NOT: getAllDevices, getDevicesByStatus, searchDevicesByName gibi genel listeleme metodları
+    // bu aşamada mimari olarak artık mantıklı değildir. Çünkü "tüm sahipsiz cihazlar" diye bir konsept yoktur.
+    // Cihazlar her zaman bir oda veya kullanıcı bağlamında listelenmelidir. Bu yüzden bu metodları şimdilik
+    // bu servisten kaldırıyoruz. Gerekirse, "kullanıcıya ait tüm cihazları" listeleyen yeni bir metod eklenebilir.
 }

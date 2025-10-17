@@ -32,21 +32,7 @@ class DeviceServiceTest {
     @InjectMocks
     private DeviceService deviceService;
 
-    @Test
-    void testGetAllDevices() {
-        // GIVEN
-        Device device1 = new Device(1L, "Lamba", true, null);
-        Device device2 = new Device(2L, "Priz", false, null);
-        List<Device> fakeDeviceList = List.of(device1, device2);
-        given(deviceRepository.findAll()).willReturn(fakeDeviceList);
 
-        // WHEN
-        List<Device> result = deviceService.getAllDevices();
-
-        // THEN
-        assertThat(result).isNotNull();
-        assertThat(result.size()).isEqualTo(2);
-    }
 
     @Test
     void getDeviceById_whenDeviceExists_shouldReturnDevice() {

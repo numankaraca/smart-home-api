@@ -5,13 +5,6 @@ import com.example.smarthomeapi.service.DeviceService;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import org.springframework.web.bind.annotation.ResponseStatus;
-import org.springframework.http.HttpStatus;
-
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/devices")
@@ -23,44 +16,27 @@ public class DeviceController {
         this.deviceService = deviceService;
     }
 
-    @GetMapping
-    public List<Device> getAllDevices() {
-        return deviceService.getAllDevices();
-    }
+    // --- Sadece bu metodlar kaldı ---
 
+    // ID'si bilinen tek bir cihazı, sadece sahibi ise getirir.
     @GetMapping("/{id}")
     public Device getDeviceById(@PathVariable Long id) {
         return deviceService.getDeviceById(id);
     }
 
-    // @PostMapping METODU BURADAN SİLİNDİ!
-
+    // ID'si bilinen tek bir cihazı, sadece sahibi ise günceller.
     @PutMapping("/{id}")
     public Device updateDevice(@PathVariable Long id, @Valid @RequestBody Device deviceDetails) {
         return deviceService.updateDevice(id, deviceDetails);
     }
 
-    // YENİ VE DOĞRU HALİ:
-    @Operation(summary = "Delete a device by its ID")
-    @ApiResponse(responseCode = "204", description = "Device deleted successfully")
+    // ID'si bilinen tek bir cihazı, sadece sahibi ise siler.
     @DeleteMapping("/{id}")
-    @ResponseStatus(HttpStatus.NO_CONTENT) // BU SATIRI EKLE
-    public void deleteDevice(@PathVariable Long id) { // DÖNÜŞ TİPİNİ void YAP
+    public ResponseEntity<Void> deleteDevice(@PathVariable Long id) {
         deviceService.deleteDevice(id);
-        // return satırı tamamen kalktı!
+        return ResponseEntity.noContent().build();
     }
 
-    @GetMapping("/search")
-    public List<Device> searchDevices(
-            @RequestParam(required = false) Boolean status,
-            @RequestParam(required = false) String name) {
-
-        if (name != null) {
-            return deviceService.searchDevicesByName(name);
-        } else if (status != null) {
-            return deviceService.getDevicesByStatus(status);
-        } else {
-            return deviceService.getAllDevices();
-        }
-    }
+    // GET / (getAllDevices) metodu buradan SİLİNDİ.
+    // GET /search metodu buradan SİLİNDİ.
 }
